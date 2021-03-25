@@ -231,7 +231,7 @@ class Detectron2_PointRendProcessFactory(dataprocess.CProcessFactory):
         self.info.documentationLink = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Detectron2"
         self.info.iconPath = "icons/detectron2.png"
-        self.info.version = "1.0.0"
+        self.info.version = "1.0.1"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
 
     def create(self, param=None):
