@@ -1,7 +1,7 @@
 from ikomia import utils, core, dataprocess
-import Detectron2_PointRend_process as processMod
-
-#PyQt GUI framework
+from ikomia.utils import qtconversion
+from Detectron2_PointRend.Detectron2_PointRend_process import Detectron2_PointRendParam
+# PyQt GUI framework
 from PyQt5.QtWidgets import *
 
 
@@ -9,13 +9,13 @@ from PyQt5.QtWidgets import *
 # - Class which implements widget associated with the process
 # - Inherits core.CProtocolTaskWidget from Ikomia API
 # --------------------
-class Detectron2_PointRendWidget(core.CProtocolTaskWidget):
+class Detectron2_PointRendWidget(core.CWorkflowTaskWidget):
 
     def __init__(self, param, parent):
-        core.CProtocolTaskWidget.__init__(self, parent)
+        core.CWorkflowTaskWidget.__init__(self, parent)
 
         if param is None:
-            self.parameters = processMod.Detectron2_PointRendParam()
+            self.parameters = Detectron2_PointRendParam()
         else:
             self.parameters = param
 
@@ -46,11 +46,11 @@ class Detectron2_PointRendWidget(core.CProtocolTaskWidget):
         self.gridLayout.setColumnStretch(2,2)
 
         # Set widget layout
-        layoutPtr = utils.PyQtToQt(self.gridLayout)
+        layoutPtr = qtconversion.PyQtToQt(self.gridLayout)
         self.setLayout(layoutPtr)
 
-        if self.parameters.cuda == False:
-           self.cuda_ckeck.setChecked(False)
+        if not self.parameters.cuda:
+            self.cuda_ckeck.setChecked(False)
 
     def onApply(self):
         # Apply button clicked slot
@@ -62,10 +62,10 @@ class Detectron2_PointRendWidget(core.CProtocolTaskWidget):
         self.emitApply(self.parameters)
 
 
-#--------------------
-#- Factory class to build process widget object
-#- Inherits dataprocess.CWidgetFactory from Ikomia API
-#--------------------
+# --------------------
+# - Factory class to build process widget object
+# - Inherits dataprocess.CWidgetFactory from Ikomia API
+# --------------------
 class Detectron2_PointRendWidgetFactory(dataprocess.CWidgetFactory):
 
     def __init__(self):

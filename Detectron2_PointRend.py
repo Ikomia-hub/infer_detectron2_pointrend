@@ -1,6 +1,4 @@
 from ikomia import dataprocess
-import Detectron2_PointRend_process as processMod
-import Detectron2_PointRend_widget as widgetMod
 
 
 # --------------------
@@ -13,9 +11,11 @@ class Detectron2_PointRend(dataprocess.CPluginProcessInterface):
         dataprocess.CPluginProcessInterface.__init__(self)
 
     def getProcessFactory(self):
+        from Detectron2_PointRend.Detectron2_PointRend_process import Detectron2_PointRendProcessFactory
         # Instantiate process object
-        return processMod.Detectron2_PointRendProcessFactory()
+        return Detectron2_PointRendProcessFactory()
 
     def getWidgetFactory(self):
+        from Detectron2_PointRend.Detectron2_PointRend_widget import Detectron2_PointRendWidgetFactory
         # Instantiate associated widget object
-        return widgetMod.Detectron2_PointRendWidgetFactory()
+        return Detectron2_PointRendWidgetFactory()

@@ -1,12 +1,11 @@
-import update_path
+from Detectron2_PointRend import update_path
 from ikomia import core, dataprocess
 import copy
-# Your imports below
 import torch
 from detectron2.engine import DefaultPredictor
 from detectron2.config import get_cfg
 from detectron2.data import MetadataCatalog
-from PointRend_git.point_rend.config import add_pointrend_config
+from Detectron2_PointRend.PointRend_git.point_rend.config import add_pointrend_config
 import os
 import random
 
@@ -14,34 +13,34 @@ import random
 # - Class to handle the process parameters
 # - Inherits core.CProtocolTaskParam from Ikomia API
 # --------------------
-class Detectron2_PointRendParam(core.CProtocolTaskParam):
+class Detectron2_PointRendParam(core.CWorkflowTaskParam):
 
     def __init__(self):
-        core.CProtocolTaskParam.__init__(self)
+        core.CWorkflowTaskParam.__init__(self)
         self.cuda = True
         self.proba = 0.8
 
-    def setParamMap(self, paramMap):
-        self.cuda = int(paramMap["cuda"])
-        self.proba = int(paramMap["proba"])
+    def setParamMap(self, param_map):
+        self.cuda = int(param_map["cuda"])
+        self.proba = int(param_map["proba"])
 
     def getParamMap(self):
-        paramMap = core.ParamMap()
-        paramMap["cuda"] = str(self.cuda)
-        paramMap["proba"] = str(self.proba)
-        return paramMap
+        param_map = core.ParamMap()
+        param_map["cuda"] = str(self.cuda)
+        param_map["proba"] = str(self.proba)
+        return param_map
 
 
 # --------------------
 # - Class which implements the process
 # - Inherits core.CProtocolTask or derived from Ikomia API
 # --------------------
-class Detectron2_PointRendProcess(dataprocess.CImageProcess2d):
+class Detectron2_PointRendProcess(dataprocess.C2dImageTask):
 
     def __init__(self, name, param):
-        dataprocess.CImageProcess2d.__init__(self, name)
+        dataprocess.C2dImageTask.__init__(self, name)
 
-        #Create parameters class
+        # Create parameters class
         if param is None:
             self.setParam(Detectron2_PointRendParam())
         else:
@@ -63,7 +62,7 @@ class Detectron2_PointRendProcess(dataprocess.CImageProcess2d):
 
         # add output + set data type
         self.setOutputDataType(core.IODataType.IMAGE_LABEL, 0)
-        self.addOutput(dataprocess.CImageProcessIO(core.IODataType.IMAGE))
+        self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
         self.addOutput(dataprocess.CGraphicsOutput())
 
     def getProgressSteps(self, eltCount=1):
@@ -211,10 +210,10 @@ class Detectron2_PointRendProcess(dataprocess.CImageProcess2d):
 # - Factory class to build process object
 # - Inherits dataprocess.CProcessFactory from Ikomia API
 # --------------------
-class Detectron2_PointRendProcessFactory(dataprocess.CProcessFactory):
+class Detectron2_PointRendProcessFactory(dataprocess.CTaskFactory):
 
     def __init__(self):
-        dataprocess.CProcessFactory.__init__(self)
+        dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
         self.info.name = "Detectron2_PointRend"
         self.info.shortDescription = "PointRend inference model of Detectron2 for instance segmentation."
