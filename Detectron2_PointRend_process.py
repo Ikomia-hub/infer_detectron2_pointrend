@@ -166,13 +166,15 @@ class Detectron2_PointRendProcess(dataprocess.C2dImageTask):
 
             # Show boxes + labels
             for i in range(len(scores_np_tresh)):
-                properties_text = core.GraphicsTextProperty() 
-                properties_text.color = colors[i+1] # start with i+1 we don't use the first color dedicated for the label mask
-                properties_text.font_size = 7
-                properties_rect = core.GraphicsRectProperty()
-                properties_rect.pen_color = colors[i+1]
-                output_graph.addRectangle(float(boxes_np[i][0]), float(boxes_np[i][1]), float(boxes_np[i][2] - boxes_np[i][0]), float(boxes_np[i][3] - boxes_np[i][1]), properties_rect)
-                output_graph.addText(labels[i],float(boxes_np[i][0]), float(boxes_np[i][1]),properties_text)
+                prop_text = core.GraphicsTextProperty()
+                # start with i+1 we don't use the first color dedicated for the label mask
+                prop_text.color = colors[i+1]
+                prop_text.font_size = 7
+                prop_rect = core.GraphicsRectProperty()
+                prop_rect.pen_color = colors[i+1]
+                prop_rect.category = labels[i]
+                output_graph.addRectangle(float(boxes_np[i][0]), float(boxes_np[i][1]), float(boxes_np[i][2] - boxes_np[i][0]), float(boxes_np[i][3] - boxes_np[i][1]), prop_rect)
+                output_graph.addText(labels[i], float(boxes_np[i][0]), float(boxes_np[i][1]), prop_text)
             
             self.emitStepProgress()
             
