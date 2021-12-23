@@ -64,6 +64,7 @@ class PointRend(dataprocess.C2dImageTask):
         self.setOutputDataType(core.IODataType.IMAGE_LABEL, 0)
         self.addOutput(dataprocess.CImageIO(core.IODataType.IMAGE))
         self.addOutput(dataprocess.CGraphicsOutput())
+        self.addOutput(dataprocess.CBlobMeasureIO())
 
     def getProgressSteps(self, eltCount=1):
         # Function returning the number of progress steps for this process
@@ -77,14 +78,15 @@ class PointRend(dataprocess.C2dImageTask):
         random.seed(30)
 
         # Get input :
-        input = self.getInput(0)
-        srcImage = input.getImage()
+        img_input = self.getInput(0)
+        src_image = img_input.getImage()
 
         # Get output :
         mask_output = self.getOutput(0)
         output_graph = self.getOutput(2)
         output_graph.setImageIndex(1)
         output_graph.setNewLayer("PointRend")
+        output_measure = self.getOutput(3)
 
         # Get parameters :
         param = self.getParam()
@@ -92,7 +94,7 @@ class PointRend(dataprocess.C2dImageTask):
         # predictor
         if not self.loaded:
             print("Chargement du modèle")
-            if param.cuda == False:
+            if not param.cuda:
                 self.cfg.MODEL.DEVICE = "cpu"
                 self.deviceFrom = "cpu"
             else:
@@ -100,7 +102,7 @@ class PointRend(dataprocess.C2dImageTask):
             self.loaded = True
             self.predictor = DefaultPredictor(self.cfg)
         # reload model if CUDA check and load without CUDA 
-        elif self.deviceFrom == "cpu" and param.cuda == True:
+        elif self.deviceFrom == "cpu" and param.cuda:
             print("Chargement du modèle")
             self.cfg = get_cfg()
             add_pointrend_config(self.cfg)
@@ -110,7 +112,7 @@ class PointRend(dataprocess.C2dImageTask):
             self.deviceFrom = "gpu"
             self.predictor = DefaultPredictor(self.cfg)
         # reload model if CUDA not check and load with CUDA
-        elif self.deviceFrom == "gpu" and param.cuda == False:
+        elif self.deviceFrom == "gpu" and not param.cuda:
             print("Chargement du modèle")
             self.cfg = get_cfg()
             add_pointrend_config(self.cfg)
@@ -121,7 +123,7 @@ class PointRend(dataprocess.C2dImageTask):
             self.deviceFrom = "cpu"
             self.predictor = DefaultPredictor(self.cfg)
 
-        outputs = self.predictor(srcImage)
+        outputs = self.predictor(src_image)
 
         # get outputs instances
         boxes = outputs["instances"].pred_boxes
@@ -130,7 +132,7 @@ class PointRend(dataprocess.C2dImageTask):
         masks = outputs["instances"].pred_masks
 
         # to numpy
-        if param.cuda :
+        if param.cuda:
             boxes_np = boxes.tensor.cpu().numpy()
             scores_np = scores.cpu().numpy()
             classes_np = classes.cpu().numpy()
@@ -142,44 +144,62 @@ class PointRend(dataprocess.C2dImageTask):
         self.emitStepProgress()
 
         # keep only the results with proba > threshold
-        scores_np_tresh = list()
+        scores_np_thresh = list()
         for s in scores_np:
             if float(s) > param.proba:
-                scores_np_tresh.append(s)
+                scores_np_thresh.append(s)
 
-        if len(scores_np_tresh) > 0:
+        if len(scores_np_thresh) > 0:
             # create random color for masks + boxes + labels
-            colors = [[0,0,0]]
-            for i in range(len(scores_np_tresh)):
-                colors.append([random.randint(0,255), random.randint(0,255), random.randint(0,255), 255])
+            colors = [[0, 0, 0]]
+            for i in range(len(scores_np_thresh)):
+                colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
 
             # text labels with scores
             labels = None
             class_names = MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]).get("thing_classes")
             if classes is not None and class_names is not None and len(class_names) > 1:
                 labels = [class_names[i] for i in classes]
-            if scores_np_tresh is not None:
-                if labels is None:
-                    labels = ["{:.0f}%".format(s * 100) for s in scores_np_tresh]
-                else:
-                    labels = ["{} {:.0f}%".format(l, s * 100) for l, s in zip(labels, scores_np_tresh)]
 
-            # Show boxes + labels
-            for i in range(len(scores_np_tresh)):
+            if scores_np_thresh is not None and labels is None:
+                labels = ["{:.0f}%".format(s * 100) for s in scores_np_thresh]
+
+            # Show boxes + labels + data
+            for i in range(len(scores_np_thresh)):
+                box_x = float(boxes_np[i][0])
+                box_y = float(boxes_np[i][1])
+                box_w = float(boxes_np[i][2] - boxes_np[i][0])
+                box_h = float(boxes_np[i][3] - boxes_np[i][1])
+                # label
                 prop_text = core.GraphicsTextProperty()
                 # start with i+1 we don't use the first color dedicated for the label mask
                 prop_text.color = colors[i+1]
-                prop_text.font_size = 7
+                prop_text.font_size = 8
+                prop_text.bold = True
+                output_graph.addText("{} {:.0f}%".format(labels[i], scores_np_thresh[i]*100), box_x, box_y, prop_text)
+                # box
                 prop_rect = core.GraphicsRectProperty()
                 prop_rect.pen_color = colors[i+1]
                 prop_rect.category = labels[i]
-                output_graph.addRectangle(float(boxes_np[i][0]), float(boxes_np[i][1]), float(boxes_np[i][2] - boxes_np[i][0]), float(boxes_np[i][3] - boxes_np[i][1]), prop_rect)
-                output_graph.addText(labels[i], float(boxes_np[i][0]), float(boxes_np[i][1]), prop_text)
+                graphics_obj = output_graph.addRectangle(box_x, box_y, box_w, box_h, prop_rect)
+                # object results
+                results = []
+                confidence_data = dataprocess.CObjectMeasure(dataprocess.CMeasure(core.MeasureId.CUSTOM, "Confidence"),
+                                                             float(scores_np_thresh[i]),
+                                                             graphics_obj.getId(),
+                                                             labels[i])
+                box_data = dataprocess.CObjectMeasure(dataprocess.CMeasure(core.MeasureId.BBOX),
+                                                      [box_x, box_y, box_w, box_h],
+                                                      graphics_obj.getId(),
+                                                      labels[i])
+                results.append(confidence_data)
+                results.append(box_data)
+                output_measure.addObjectMeasures(results)
             
             self.emitStepProgress()
             
             # label mask
-            nb_objects = len(masks[:len(scores_np_tresh)]) 
+            nb_objects = len(masks[:len(scores_np_thresh)])
             if nb_objects > 0:
                 masks = masks[:nb_objects, :, :, None]
                 mask_or = masks[0]*nb_objects
@@ -192,7 +212,7 @@ class PointRend(dataprocess.C2dImageTask):
                 # inverse colors to match boxes colors
                 c = colors[1:]
                 c = c[::-1]
-                colors = [[0,0,0]]
+                colors = [[0, 0, 0]]
                 for col in c:
                     colors.append(col)
                 self.setOutputColorMap(1, 0, colors)
@@ -232,7 +252,7 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.documentationLink = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Detectron2"
         self.info.iconPath = "icons/detectron2.png"
-        self.info.version = "1.0.1"
+        self.info.version = "1.1.0"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
 
     def create(self, param=None):
