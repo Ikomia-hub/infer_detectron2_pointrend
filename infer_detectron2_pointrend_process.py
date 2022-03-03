@@ -250,7 +250,7 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.license = "Apache-2.0 License"
         self.info.repo = "https://github.com/facebookresearch/detectron2/tree/master/projects/PointRend"
         self.info.documentationLink = "https://detectron2.readthedocs.io/index.html"
-        self.info.path = "Plugins/Python/Detectron2"
+        self.info.path = "Plugins/Python/Segmentation"
         self.info.iconPath = "icons/detectron2.png"
         self.info.version = "1.1.0"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
