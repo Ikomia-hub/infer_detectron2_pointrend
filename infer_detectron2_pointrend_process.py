@@ -66,7 +66,7 @@ class PointRend(dataprocess.C2dImageTask):
         self.addOutput(dataprocess.CGraphicsOutput())
         self.addOutput(dataprocess.CBlobMeasureIO())
 
-    def getProgressSteps(self, eltCount=1):
+    def getProgressSteps(self):
         # Function returning the number of progress steps for this process
         # This is handled by the main progress bar of Ikomia application
         return 3
