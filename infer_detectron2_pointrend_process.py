@@ -48,15 +48,14 @@ class PointRend(dataprocess.C2dImageTask):
 
         self.threshold = 0.5
         self.MODEL_NAME_CONFIG = "pointrend_rcnn_R_50_FPN_3x_coco"
-        self.MODEL_NAME = "model_final_3c3198"
         self.path_to_config = "/PointRend_git/configs/InstanceSegmentation/"+self.MODEL_NAME_CONFIG+".yaml"
-        self.path_to_model = "/models/"+self.MODEL_NAME+".pkl"
         self.folder = os.path.dirname(os.path.realpath(__file__))
         self.cfg = get_cfg()
         add_pointrend_config(self.cfg)
         self.cfg.merge_from_file(self.folder + self.path_to_config)
         self.cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = self.threshold
-        self.cfg.MODEL.WEIGHTS = self.folder + self.path_to_model
+        self.cfg.MODEL.WEIGHTS = "detectron2://PointRend/InstanceSegmentation/pointrend_rcnn_R_50_FPN_3x_coco/" \
+                                 "164955410/model_final_edd263.pkl"
         self.loaded = False
         self.deviceFrom = ""
 
