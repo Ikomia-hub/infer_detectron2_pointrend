@@ -9,6 +9,7 @@ from infer_detectron2_pointrend.PointRend_git.point_rend.config import add_point
 import os
 import random
 
+
 # --------------------
 # - Class to handle the process parameters
 # - Inherits core.CProtocolTaskParam from Ikomia API
@@ -48,7 +49,7 @@ class PointRend(dataprocess.C2dImageTask):
 
         self.threshold = 0.5
         self.MODEL_NAME_CONFIG = "pointrend_rcnn_R_50_FPN_3x_coco"
-        self.path_to_config = "/PointRend_git/configs/InstanceSegmentation/"+self.MODEL_NAME_CONFIG+".yaml"
+        self.path_to_config = "/PointRend_git/configs/InstanceSegmentation/" + self.MODEL_NAME_CONFIG + ".yaml"
         self.folder = os.path.dirname(os.path.realpath(__file__))
         self.cfg = get_cfg()
         add_pointrend_config(self.cfg)
@@ -135,7 +136,7 @@ class PointRend(dataprocess.C2dImageTask):
             boxes_np = boxes.tensor.cpu().numpy()
             scores_np = scores.cpu().numpy()
             classes_np = classes.cpu().numpy()
-        else :
+        else:
             boxes_np = boxes.tensor.numpy()
             scores_np = scores.numpy()
             classes_np = classes.numpy()
@@ -172,13 +173,13 @@ class PointRend(dataprocess.C2dImageTask):
                 # label
                 prop_text = core.GraphicsTextProperty()
                 # start with i+1 we don't use the first color dedicated for the label mask
-                prop_text.color = colors[i+1]
+                prop_text.color = colors[i + 1]
                 prop_text.font_size = 8
                 prop_text.bold = True
-                output_graph.addText("{} {:.0f}%".format(labels[i], scores_np_thresh[i]*100), box_x, box_y, prop_text)
+                output_graph.addText("{} {:.0f}%".format(labels[i], scores_np_thresh[i] * 100), box_x, box_y, prop_text)
                 # box
                 prop_rect = core.GraphicsRectProperty()
-                prop_rect.pen_color = colors[i+1]
+                prop_rect.pen_color = colors[i + 1]
                 prop_rect.category = labels[i]
                 graphics_obj = output_graph.addRectangle(box_x, box_y, box_w, box_h, prop_rect)
                 # object results
@@ -194,16 +195,16 @@ class PointRend(dataprocess.C2dImageTask):
                 results.append(confidence_data)
                 results.append(box_data)
                 output_measure.addObjectMeasures(results)
-            
+
             self.emitStepProgress()
-            
+
             # label mask
             nb_objects = len(masks[:len(scores_np_thresh)])
             if nb_objects > 0:
                 masks = masks[:nb_objects, :, :, None]
-                mask_or = masks[0]*nb_objects
+                mask_or = masks[0] * nb_objects
                 for j in range(1, nb_objects):
-                    mask_or = torch.max(mask_or, masks[j] * (nb_objects-j))
+                    mask_or = torch.max(mask_or, masks[j] * (nb_objects - j))
                 mask_numpy = mask_or.byte().cpu().numpy()
                 mask_output.setImage(mask_numpy)
 
@@ -217,7 +218,7 @@ class PointRend(dataprocess.C2dImageTask):
                 self.setOutputColorMap(1, 0, colors)
         else:
             self.emitStepProgress()
-        
+
         self.forwardInputImage(0, 1)
 
         # Step progress bar:
