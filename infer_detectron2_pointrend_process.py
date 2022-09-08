@@ -144,7 +144,7 @@ class PointRend(dataprocess.C2dImageTask):
                 w = float(x2 - x1)
                 h = float(y2 - y1)
                 cls = int(cls.cpu().numpy())
-                instance_out.addInstance(cls, class_names[cls], float(score),
+                instance_out.addInstance(0, cls, class_names[cls], float(score),
                                          float(x1), float(y1), w, h,
                                          mask.byte().cpu().numpy(), colors[cls + 1])
 
