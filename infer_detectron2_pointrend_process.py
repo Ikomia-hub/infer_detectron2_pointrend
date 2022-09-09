@@ -138,15 +138,17 @@ class PointRend(dataprocess.C2dImageTask):
             colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
 
         # Show boxes + labels + data
+        index = 0
         for box, score, cls, mask in zip(boxes, scores, classes, masks):
             if score > param.proba:
                 x1, y1, x2, y2 = box.cpu().numpy()
                 w = float(x2 - x1)
                 h = float(y2 - y1)
                 cls = int(cls.cpu().numpy())
-                instance_out.addInstance(0, cls, class_names[cls], float(score),
+                instance_out.addInstance(index, 0, cls, class_names[cls], float(score),
                                          float(x1), float(y1), w, h,
                                          mask.byte().cpu().numpy(), colors[cls + 1])
+            index += 1
 
         self.setOutputColorMap(0, 1, colors)
         self.emitStepProgress()
