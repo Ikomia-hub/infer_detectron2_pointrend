@@ -10,12 +10,12 @@ class IkomiaPlugin(dataprocess.CPluginProcessInterface):
     def __init__(self):
         dataprocess.CPluginProcessInterface.__init__(self)
 
-    def getProcessFactory(self):
+    def get_process_factory(self):
         from infer_detectron2_pointrend.infer_detectron2_pointrend_process import PointRendFactory
         # Instantiate process object
         return PointRendFactory()
 
-    def getWidgetFactory(self):
+    def get_widget_factory(self):
         from infer_detectron2_pointrend.infer_detectron2_pointrend_widget import PointRendWidgetFactory
         # Instantiate associated widget object
         return PointRendWidgetFactory()

@@ -22,12 +22,12 @@ class PointRendParam(core.CWorkflowTaskParam):
         self.cuda = True
         self.proba = 0.8
 
-    def setParamMap(self, param_map):
+    def set_values(self, param_map):
         self.cuda = int(param_map["cuda"])
         self.proba = int(param_map["proba"])
 
-    def getParamMap(self):
-        param_map = core.ParamMap()
+    def get_values(self):
+        param_map = {}
         param_map["cuda"] = str(self.cuda)
         param_map["proba"] = str(self.proba)
         return param_map
@@ -37,16 +37,16 @@ class PointRendParam(core.CWorkflowTaskParam):
 # - Class which implements the process
 # - Inherits core.CProtocolTask or derived from Ikomia API
 # --------------------
-class PointRend(dataprocess.C2dImageTask):
+class PointRend(dataprocess.CInstanceSegmentationTask):
 
     def __init__(self, name, param):
-        dataprocess.C2dImageTask.__init__(self, name)
+        dataprocess.CInstanceSegmentationTask.__init__(self, name)
 
         # Create parameters class
         if param is None:
-            self.setParam(PointRendParam())
+            self.set_param_object(PointRendParam())
         else:
-            self.setParam(copy.deepcopy(param))
+            self.set_param_object(copy.deepcopy(param))
 
         self.threshold = 0.5
         self.MODEL_NAME_CONFIG = "pointrend_rcnn_R_50_FPN_3x_coco"
@@ -62,31 +62,24 @@ class PointRend(dataprocess.C2dImageTask):
         self.deviceFrom = ""
         self.predictor = None
 
-        # add output
-        self.addOutput(dataprocess.CInstanceSegIO())
-
-    def getProgressSteps(self):
+    def get_progress_steps(self):
         # Function returning the number of progress steps for this process
         # This is handled by the main progress bar of Ikomia application
-        return 3
+        return 2
 
     def run(self):
-        self.beginTaskRun()
+        self.begin_task_run()
 
         # we use seed to keep the same color for our masks + boxes + labels (same random each time)
         random.seed(30)
 
         # Get input :
-        img_input = self.getInput(0)
-        src_image = img_input.getImage()
+        img_input = self.get_input(0)
+        src_image = img_input.get_image()
         h, w, _ = np.shape(src_image)
 
-        # Get output :
-        instance_out = self.getOutput(1)
-        instance_out.init("PointRend", 0, w, h)
-
         # Get parameters :
-        param = self.getParam()
+        param = self.get_param_object()
 
         # predictor
         if not self.loaded:
@@ -123,19 +116,14 @@ class PointRend(dataprocess.C2dImageTask):
 
         outputs = self.predictor(src_image)
         class_names = MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]).get("thing_classes")
+        self.set_names(class_names)
 
         # get outputs instances
         boxes = outputs["instances"].pred_boxes
         scores = outputs["instances"].scores
         classes = outputs["instances"].pred_classes
         masks = outputs["instances"].pred_masks
-        self.emitStepProgress()
-
-        # create random color for masks + boxes + labels
-        np.random.seed(10)
-        colors = [[0, 0, 0]]
-        for i in range(len(class_names)):
-            colors.append([random.randint(0, 255), random.randint(0, 255), random.randint(0, 255), 255])
+        self.emit_step_progress()
 
         # Show boxes + labels + data
         index = 0
@@ -145,17 +133,14 @@ class PointRend(dataprocess.C2dImageTask):
                 w = float(x2 - x1)
                 h = float(y2 - y1)
                 cls = int(cls.cpu().numpy())
-                instance_out.addInstance(index, 0, cls, class_names[cls], float(score),
+                self.add_instance(index, 0, cls, float(score),
                                          float(x1), float(y1), w, h,
-                                         mask.byte().cpu().numpy(), colors[cls + 1])
+                                         mask.byte().cpu().numpy())
             index += 1
 
-        self.setOutputColorMap(0, 1, colors)
-        self.emitStepProgress()
-        self.forwardInputImage(0, 0)
-        self.emitStepProgress()
-        # Call endTaskRun to finalize process
-        self.endTaskRun()
+        self.emit_step_progress()
+        # Call end_task_run to finalize process
+        self.end_task_run()
 
 
 # --------------------
@@ -168,7 +153,7 @@ class PointRendFactory(dataprocess.CTaskFactory):
         dataprocess.CTaskFactory.__init__(self)
         # Set process information as string here
         self.info.name = "infer_detectron2_pointrend"
-        self.info.shortDescription = "PointRend inference model of Detectron2 for instance segmentation."
+        self.info.short_description = "PointRend inference model of Detectron2 for instance segmentation."
         self.info.description = "PointRend inference model for instance segmentation trained on COCO. " \
                                 "Implementation from Detectron2 (Facebook Research). " \
                                 "PointRend algorithm provides more accurate segmentation mask. " \
@@ -179,10 +164,10 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.year = 2019
         self.info.license = "Apache-2.0 License"
         self.info.repo = "https://github.com/facebookresearch/detectron2/tree/master/projects/PointRend"
-        self.info.documentationLink = "https://detectron2.readthedocs.io/index.html"
+        self.info.documentation_link = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Segmentation"
-        self.info.iconPath = "icons/detectron2.png"
-        self.info.version = "1.3.0"
+        self.info.icon_path = "icons/detectron2.png"
+        self.info.version = "1.4.0"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
 
     def create(self, param=None):
