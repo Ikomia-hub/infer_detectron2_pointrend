@@ -23,26 +23,26 @@ class PointRendWidget(core.CWorkflowTaskWidget):
         self.gridLayout = QGridLayout()
 
         # cuda parameter
-        cuda_label = QLabel("CUDA")
+        cuda_label = QLabel("Cuda")
         self.cuda_ckeck = QCheckBox()
         self.cuda_ckeck.setChecked(True)
 
-        # proba parameter
-        proba_label = QLabel("Threshold :")
+        # conf_tresh parameter
+        conf_tresh_label = QLabel("Threshold :")
        
-        self.proba_spinbox = QDoubleSpinBox()
-        self.proba_spinbox.setValue(0.8)
-        self.proba_spinbox.setSingleStep(0.1)
-        self.proba_spinbox.setMaximum(1)
-        if self.parameters.proba != 0.8:
-            self.proba_spinbox.setValue(self.parameters.proba)
+        self.conf_tresh_spinbox = QDoubleSpinBox()
+        self.conf_tresh_spinbox.setValue(0.8)
+        self.conf_tresh_spinbox.setSingleStep(0.1)
+        self.conf_tresh_spinbox.setMaximum(1)
+        if self.parameters.conf_tresh != 0.8:
+            self.conf_tresh_spinbox.setValue(self.parameters.conf_tresh)
 
         self.gridLayout.setColumnStretch(0,0)
         self.gridLayout.addWidget(self.cuda_ckeck, 0, 0)
         self.gridLayout.setColumnStretch(1,1)
         self.gridLayout.addWidget(cuda_label, 0, 1)
-        self.gridLayout.addWidget(proba_label, 1, 0)
-        self.gridLayout.addWidget(self.proba_spinbox, 1, 1)
+        self.gridLayout.addWidget(conf_tresh_label, 1, 0)
+        self.gridLayout.addWidget(self.conf_tresh_spinbox, 1, 1)
         self.gridLayout.setColumnStretch(2,2)
 
         # Set widget layout
@@ -58,7 +58,7 @@ class PointRendWidget(core.CWorkflowTaskWidget):
             self.parameters.cuda = True
         else:
             self.parameters.cuda = False
-        self.parameters.proba = self.proba_spinbox.value()
+        self.parameters.conf_tresh = self.conf_tresh_spinbox.value()
         self.emit_apply(self.parameters)
 
 

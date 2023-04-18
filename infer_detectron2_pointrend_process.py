@@ -20,16 +20,16 @@ class PointRendParam(core.CWorkflowTaskParam):
     def __init__(self):
         core.CWorkflowTaskParam.__init__(self)
         self.cuda = True
-        self.proba = 0.8
+        self.conf_tresh = 0.8
 
     def set_values(self, param_map):
         self.cuda = int(param_map["cuda"])
-        self.proba = int(param_map["proba"])
+        self.conf_tresh = int(param_map["conf_tresh"])
 
     def get_values(self):
         param_map = {}
         param_map["cuda"] = str(self.cuda)
-        param_map["proba"] = str(self.proba)
+        param_map["conf_tresh"] = str(self.conf_tresh)
         return param_map
 
 
@@ -128,7 +128,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
         # Show boxes + labels + data
         index = 0
         for box, score, cls, mask in zip(boxes, scores, classes, masks):
-            if score > param.proba:
+            if score > param.conf_tresh:
                 x1, y1, x2, y2 = box.cpu().numpy()
                 w = float(x2 - x1)
                 h = float(y2 - y1)
