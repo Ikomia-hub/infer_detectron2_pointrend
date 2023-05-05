@@ -133,9 +133,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
                 w = float(x2 - x1)
                 h = float(y2 - y1)
                 cls = int(cls.cpu().numpy())
-                self.add_instance(index, 0, cls, float(score),
-                                         float(x1), float(y1), w, h,
-                                         mask.byte().cpu().numpy())
+                self.add_object(index, 0, cls, float(score), float(x1), float(y1), w, h, mask.byte().cpu().numpy())
             index += 1
 
         self.emit_step_progress()
