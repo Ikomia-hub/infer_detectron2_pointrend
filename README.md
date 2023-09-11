@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="images/icon.png" alt="Algorithm icon">
-  <h1 align="center">_algorithm_name_</h1>
+  <img src="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/main/icons/detectron2.png" alt="Algorithm icon">
+  <h1 align="center">infer_detectron2_pointrend</h1>
 </div>
 <br />
 <p align="center">
-    <a href="https://github.com/Ikomia-hub/_algorithm_name_">
-        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/_algorithm_name_">
+    <a href="https://github.com/Ikomia-hub/infer_detectron2_pointrend">
+        <img alt="Stars" src="https://img.shields.io/github/stars/Ikomia-hub/infer_detectron2_pointrend">
     </a>
     <a href="https://app.ikomia.ai/hub/">
         <img alt="Website" src="https://img.shields.io/website/http/app.ikomia.ai/en.svg?down_color=red&down_message=offline&up_message=online">
     </a>
-    <a href="https://github.com/Ikomia-hub/_algorithm_name_/blob/main/LICENSE.md">
-        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/_algorithm_name_.svg?color=blue">
+    <a href="https://github.com/Ikomia-hub/infer_detectron2_pointrend/blob/main/LICENSE">
+        <img alt="GitHub" src="https://img.shields.io/github/license/Ikomia-hub/detectron2_pointrend.svg?color=blue">
     </a>    
     <br>
     <a href="https://discord.com/invite/82Tnw9UGGc">
@@ -19,10 +19,9 @@
     </a> 
 </p>
 
-[Put algorithm description here]
+Run Detectron2 pointrend algorithm. It is an instance segmentation algorithm.
 
-[Insert illustrative image here. Image must be accessible publicly, in algorithm Github repository for example.
-<img src="images/illustration.png"  alt="Illustrative image" width="30%" height="30%">]
+![example](https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_result.jpg)
 
 ## :rocket: Use with Ikomia API
 
@@ -36,20 +35,22 @@ pip install ikomia
 
 #### 2. Create your workflow
 
-[Change the sample image URL to fit algorithm purpose]
 
 ```python
-import ikomia
 from ikomia.dataprocess.workflow import Workflow
+from ikomia.utils.displayIO import display
 
 # Init your workflow
 wf = Workflow()
 
 # Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
+algo = wf.add_task(name="infer_detectron2_pointrend", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_example.jpg")
+
+# Display result
+display(algo.get_image_with_mask_and_graphics())
 ```
 
 ## :sunny: Use with Ikomia Studio
@@ -62,56 +63,38 @@ Ikomia Studio offers a friendly UI with the same features as the API.
 
 ## :pencil: Set algorithm parameters
 
-[Explain each algorithm parameters]
-
-[Change the sample image URL to fit algorithm purpose]
+- **conf_thres** (float) - Default 0.8: Box threshold for the prediction [0,1].
+- **cuda** (bool) - Default True: If True, CUDA-based inference (GPU). If False, run on CPU.
 
 ```python
-import ikomia
-from ikomia.dataprocess.workflow import Workflow
-
-# Init your workflow
-wf = Workflow()
-
-# Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
-
 algo.set_parameters({
-    "param1": "value1",
-    "param2": "value2",
-    ...
+    "conf_thres": "0.5",
+    "cuda": "False",
 })
-
-# Run on your image  
-wf.run_on(url="example_image.png")
-
 ```
+
+*Note*: parameter key and value should be in **string format** when added to the dictionary.
 
 ## :mag: Explore algorithm outputs
 
 Every algorithm produces specific outputs, yet they can be explored them the same way using the Ikomia API. For a more in-depth understanding of managing algorithm outputs, please refer to the [documentation](https://ikomia-dev.github.io/python-api-documentation/advanced_guide/IO_management.html).
 
 ```python
-import ikomia
 from ikomia.dataprocess.workflow import Workflow
 
 # Init your workflow
 wf = Workflow()
 
 # Add algorithm
-algo = wf.add_task(name="_algorithm_name_", auto_connect=True)
+algo = wf.add_task(name="infer_detectron2_pointrend", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="example_image.png")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_example.jpg")
 
 # Iterate over outputs
-for output in algo.get_outputs()
+for output in algo.get_outputs():
     # Print information
     print(output)
     # Export it to JSON
     output.to_json()
 ```
-
-## :fast_forward: Advanced usage 
-
-[optional]
