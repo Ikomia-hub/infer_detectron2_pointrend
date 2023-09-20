@@ -139,6 +139,8 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
                 self.add_object(index, 0, cls, float(score), float(x1), float(y1), w, h, mask.byte().cpu().numpy())
             index += 1
 
+        os.environ.pop("FVCORE_CACHE")
+
         self.emit_step_progress()
         # Call end_task_run to finalize process
         self.end_task_run()
@@ -168,7 +170,7 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.documentation_link = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Segmentation"
         self.info.icon_path = "icons/detectron2.png"
-        self.info.version = "1.4.0"
+        self.info.version = "1.5.0"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
 
     def create(self, param=None):
