@@ -1,5 +1,5 @@
 from infer_detectron2_pointrend import update_path
-from ikomia import core, dataprocess
+from ikomia import core, dataprocess, utils
 import copy
 import torch
 from detectron2.engine import DefaultPredictor
@@ -23,8 +23,8 @@ class PointRendParam(core.CWorkflowTaskParam):
         self.conf_tresh = 0.8
 
     def set_values(self, param_map):
-        self.cuda = int(param_map["cuda"])
-        self.conf_tresh = int(param_map["conf_tresh"])
+        self.cuda = utils.strtobool(param_map["cuda"])
+        self.conf_tresh = float(param_map["conf_tresh"])
 
     def get_values(self):
         param_map = {}
