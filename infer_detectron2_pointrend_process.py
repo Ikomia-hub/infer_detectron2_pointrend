@@ -87,7 +87,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
         # predictor
         if not self.loaded:
             print("Loading model...")
-            if not param.cuda:
+            if not param.cuda or not torch.cuda.is_available():
                 self.cfg.MODEL.DEVICE = "cpu"
                 self.deviceFrom = "cpu"
             else:
