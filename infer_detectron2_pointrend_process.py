@@ -96,7 +96,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
             self.loaded = True
             self.predictor = DefaultPredictor(self.cfg)
         # reload model if CUDA check and load without CUDA 
-        elif self.deviceFrom == "cpu" and param.cuda:
+        elif self.deviceFrom == "cpu" and param.cuda and torch.cuda.is_available():
             print("Loading model...")
             self.cfg = get_cfg()
             add_pointrend_config(self.cfg)
@@ -106,7 +106,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
             self.deviceFrom = "gpu"
             self.predictor = DefaultPredictor(self.cfg)
         # reload model if CUDA not check and load with CUDA
-        elif self.deviceFrom == "gpu" and not param.cuda:
+        elif self.deviceFrom == "gpu" and not(param.cuda and torch.cuda.is_available()):
             print("Loading model...")
             self.cfg = get_cfg()
             add_pointrend_config(self.cfg)
