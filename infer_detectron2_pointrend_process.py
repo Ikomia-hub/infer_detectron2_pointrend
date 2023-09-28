@@ -157,16 +157,13 @@ class PointRendFactory(dataprocess.CTaskFactory):
         # Set process information as string here
         self.info.name = "infer_detectron2_pointrend"
         self.info.short_description = "PointRend inference model of Detectron2 for instance segmentation."
-        self.info.description = "PointRend inference model for instance segmentation trained on COCO. " \
-                                "Implementation from Detectron2 (Facebook Research). " \
-                                "PointRend algorithm provides more accurate segmentation mask. " \
-                                "This plugin offers inference for ResNet50 backbone + FPN head."
         self.info.authors = "Alexander Kirillov, Yuxin Wu, Kaiming He, Ross Girshick"
         self.info.article = "PointRend: Image Segmentation as Rendering"
         self.info.journal = "ArXiv:1912.08193"
         self.info.year = 2019
         self.info.license = "Apache-2.0 License"
-        self.info.repo = "https://github.com/facebookresearch/detectron2/tree/master/projects/PointRend"
+        self.info.repository = "https://github.com/Ikomia-hub/infer_detectron2_pointrend"
+        self.info.original_repository = "https://github.com/facebookresearch/detectron2/tree/master/projects/PointRend"
         self.info.documentation_link = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Segmentation"
         self.info.icon_path = "icons/detectron2.png"
