@@ -21,7 +21,7 @@
 
 Run Detectron2 pointrend algorithm. It is an instance segmentation algorithm.
 
-![example](https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_result.jpg)
+![example](https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/main/icons/pointrend_result.jpg)
 
 ## :rocket: Use with Ikomia API
 
@@ -47,7 +47,7 @@ wf = Workflow()
 algo = wf.add_task(name="infer_detectron2_pointrend", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_example.jpg")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/main/icons/pointrend_example.jpg")
 
 # Display result
 display(algo.get_image_with_mask_and_graphics())
@@ -89,7 +89,7 @@ wf = Workflow()
 algo = wf.add_task(name="infer_detectron2_pointrend", auto_connect=True)
 
 # Run on your image  
-wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/feat/new_readme/icons/pointrend_example.jpg")
+wf.run_on(url="https://raw.githubusercontent.com/Ikomia-hub/infer_detectron2_pointrend/main/icons/pointrend_example.jpg")
 
 # Iterate over outputs
 for output in algo.get_outputs():
