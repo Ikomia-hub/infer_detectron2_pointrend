@@ -167,7 +167,7 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.documentation_link = "https://detectron2.readthedocs.io/index.html"
         self.info.path = "Plugins/Python/Segmentation"
         self.info.icon_path = "icons/detectron2.png"
-        self.info.version = "1.5.0"
+        self.info.version = "1.5.1"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
         self.info.algo_type = core.AlgoType.INFER
         self.info.algo_tasks = "INSTANCE_SEGMENTATION"
