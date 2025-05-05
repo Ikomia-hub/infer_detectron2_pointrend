@@ -50,7 +50,8 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
 
         self.threshold = 0.5
         self.MODEL_NAME_CONFIG = "pointrend_rcnn_R_50_FPN_3x_coco"
-        self.path_to_config = "/PointRend_git/configs/InstanceSegmentation/" + self.MODEL_NAME_CONFIG + ".yaml"
+        self.path_to_config = "/PointRend_git/configs/InstanceSegmentation/" + \
+            self.MODEL_NAME_CONFIG + ".yaml"
         self.folder = os.path.dirname(os.path.realpath(__file__))
         self.cfg = get_cfg()
         add_pointrend_config(self.cfg)
@@ -82,7 +83,8 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
         param = self.get_param_object()
 
         # Set cache dir in the algorithm folder to simplify deployment
-        os.environ["FVCORE_CACHE"] = os.path.join(os.path.dirname(__file__), "models")
+        os.environ["FVCORE_CACHE"] = os.path.join(
+            os.path.dirname(__file__), "models")
 
         # predictor
         if not self.loaded:
@@ -95,7 +97,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
 
             self.loaded = True
             self.predictor = DefaultPredictor(self.cfg)
-        # reload model if CUDA check and load without CUDA 
+        # reload model if CUDA check and load without CUDA
         elif self.deviceFrom == "cpu" and param.cuda and torch.cuda.is_available():
             print("Loading model...")
             self.cfg = get_cfg()
@@ -106,7 +108,7 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
             self.deviceFrom = "gpu"
             self.predictor = DefaultPredictor(self.cfg)
         # reload model if CUDA not check and load with CUDA
-        elif self.deviceFrom == "gpu" and not(param.cuda and torch.cuda.is_available()):
+        elif self.deviceFrom == "gpu" and not (param.cuda and torch.cuda.is_available()):
             print("Loading model...")
             self.cfg = get_cfg()
             add_pointrend_config(self.cfg)
@@ -118,7 +120,8 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
             self.predictor = DefaultPredictor(self.cfg)
 
         outputs = self.predictor(src_image)
-        class_names = MetadataCatalog.get(self.cfg.DATASETS.TRAIN[0]).get("thing_classes")
+        class_names = MetadataCatalog.get(
+            self.cfg.DATASETS.TRAIN[0]).get("thing_classes")
         self.set_names(class_names)
 
         # get outputs instances
@@ -136,7 +139,8 @@ class PointRend(dataprocess.CInstanceSegmentationTask):
                 w = float(x2 - x1)
                 h = float(y2 - y1)
                 cls = int(cls.cpu().numpy())
-                self.add_object(index, 0, cls, float(score), float(x1), float(y1), w, h, mask.byte().cpu().numpy())
+                self.add_object(index, 0, cls, float(score), float(
+                    x1), float(y1), w, h, mask.byte().cpu().numpy())
             index += 1
 
         os.environ.pop("FVCORE_CACHE")
@@ -168,6 +172,9 @@ class PointRendFactory(dataprocess.CTaskFactory):
         self.info.path = "Plugins/Python/Segmentation"
         self.info.icon_path = "icons/detectron2.png"
         self.info.version = "1.5.2"
+        # Python compatibility
+        self.info.min_python_version = "3.8.0"
+        self.info.min_ikomia_version = "0.13.0"
         self.info.keywords = "mask,rcnn,PointRend,facebook,detectron2,segmentation"
         self.info.algo_type = core.AlgoType.INFER
         self.info.algo_tasks = "INSTANCE_SEGMENTATION"
